@@ -1,12 +1,34 @@
 import pygame
 import random
-from candies import GamePiece, Candy, Peppermint, Tree, Hat, CandyCane, Joy
-from gameboard import Start, Board
-
+from gameboard import Start, Help, Board
+# The template of PygameGame is from Lukas Peraza 2015 112 Pygame Lecture
 class PygameGame(object):
 
     def init(self):
-        pass
+        self.margin = max(self.height, self.width) // 8
+        self.rows = self.cols = 8
+        self.boxWidth = (self.width - 3 * self.margin) // self.cols
+        self.boxHeight = (self.height - 2 * self.margin) // self.rows
+        #initialize highlight
+        self.highlightX = 0
+        self.highlightY = 0
+        self.startX = 0
+        self.startY = 0
+        #set candies
+        self.peppermint = pygame.image.load("/Users/elizabethschulz/Desktop/112/term project/candy1-2.png").convert_alpha()
+        self.tree = pygame.image.load("/Users/elizabethschulz/Desktop/112/term project/christmastree.png").convert_alpha()
+        self.candyCane = pygame.image.load("/Users/elizabethschulz/Desktop/112/term project/candycane.png").convert_alpha()
+        self.hat = pygame.image.load("/Users/elizabethschulz/Desktop/112/term project/santa.png").convert_alpha()
+        self.joy = pygame.image.load("/Users/elizabethschulz/Desktop/112/term project/joy.png").convert_alpha()
+        self.snowflake = pygame.image.load("/Users/elizabethschulz/Desktop/112/term project/snowflake.png").convert_alpha()
+        self.hotcoco = pygame.image.load("/Users/elizabethschulz/Desktop/112/term project/hot chocolate.png").convert_alpha()
+        self.candies = [self.peppermint, self.tree, self.candyCane, self.hat, self.joy]
+        #create board
+        self.board = []
+        for row in range(self.rows):
+            self.board += [[]]
+            for col in range(self.cols):
+                self.board[row] += [random.choice(self.candies)]
 
     def mousePressed(self, x, y):
         pass
@@ -41,11 +63,18 @@ class PygameGame(object):
         self.width = width
         self.height = height
         self.fps = fps
+        self.time = 0
         self.title = title
         self.score = 0
+        self.moves = 30
+        self.goal = 1500
         self.grey = 192,192,192
         self.yellow = 255,255,0
         self.black = 0,0,0
+        self.green = 23, 110, 10
+        self.brown = 102, 51, 0
+        self.red = 226,6,6
+        self.white = 255,255,255
         pygame.init()
 
     def run(self):
@@ -54,7 +83,9 @@ class PygameGame(object):
         screen = pygame.display.set_mode((self.width, self.height))
         # set the title of the window
         pygame.display.set_caption(self.title)
-
+        background = pygame.image.load("/Users/elizabethschulz/Desktop/112/term project/snow.png")
+        self.bg = pygame.transform.scale(background, (self.width,
+                self.height))
         # stores all the keys currently being held down
         self._keys = dict()
 
@@ -88,38 +119,57 @@ class PygameGame(object):
             screen.blit(self.bg,(0,0))
             self.redrawAll(screen)
             pygame.display.flip()
-
+            
         pygame.quit()
         
 class Game(PygameGame):
-    def init(self):
-        if self.mode == "start":
-            Start.init(self)
-        else:
-            Board.init(self)
             
     def mousePressed(self, x, y):
         if self.mode == "start":
-            Start.mousePressed(self, x, y)
+            Start.startMousePressed(self, x, y)
+        elif self.mode == "help":
+            Help.helpMousePressed(self, x, y)
+        elif self.mode == "winner":
+            Winner.winnerMousePressed(self, x, y)
+        elif self.mode == "gameOver":
+            GameOver.gameOverMousePressed(self, x, y)
         else:
-            Board.mousePressed(self,x,y)
+            Board.boardMousePressed(self,x,y)
             
     def keyPressed(self, keyCode, modifier):
         if self.mode == "start":
-            Start.keyPressed(self, keyCode, modifier)
+            Start.startKeyPressed(self, keyCode, modifier)
+        elif self.mode == "help":
+            Help.helpKeyPressed(self, keyCode, modifier)
+        elif self.mode == "winner":
+            Winner.winnerKeyPressed(self, keyCode, modifier)
+        elif self.mode == "gameOver":
+            GameOver.gameOverKeyPressed(self, keyCode, modifier)
         else:
-            Board.keyPressed(self, keyCode, modifier)
+            Board.boardKeyPressed(self, keyCode, modifier)
             
     def timerFired(self, dt):
         if self.mode == "start":
-            Start.timerFired(self, dt)
+            Start.startTimerFired(self, dt)
+        elif self.mode == "help":
+            Help.helpTimerFired(self, dt)
+        elif self.mode == "winner":
+            Winner.winnerTimerFired(self, dt)
+        elif self.mode == "gameOver":
+            GameOver.gameOverTimerFired(self, dt)
         else:
-            Board.timerFired(self, dt)
+            Board.boardTimerFired(self, dt)
             
     def redrawAll(self, screen):
         if self.mode == "start":
-            Start.redrawAll(self, screen)
+            Start.startRedrawAll(self, screen)
+        elif self.mode == "help":
+            Help.helpRedrawAll(self, screen)
+        elif self.mode == "winner":
+            Winner.winnerRedrawAll(self, screen)
+        elif self.mode == "gameOver":
+            GameOver.gameOverRedrawAll(self, screen)
         else:
-            Board.redrawAll(self, screen)
+            Board.boardRedrawAll(self, screen)
             
 Game().run()
